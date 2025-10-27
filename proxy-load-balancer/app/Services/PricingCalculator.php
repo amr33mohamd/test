@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Exception;
 class PricingCalculator
 {
     const PLANS = [
