@@ -10,3 +10,6 @@ yarn-error.log
 /.idea
 /.vscode
 .DS_Store
+
+# Solution file (for interviewer reference only - keep local)
+SOLUTION.md
