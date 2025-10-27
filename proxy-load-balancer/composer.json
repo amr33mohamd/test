@@ -25,6 +25,12 @@
     "scripts": {
         "test": "phpunit",
         "post-autoload-dump": [
+            "@php -r \"is_dir('storage/framework/sessions') || mkdir('storage/framework/sessions', 0755, true);\"",
+            "@php -r \"is_dir('storage/framework/views') || mkdir('storage/framework/views', 0755, true);\"",
+            "@php -r \"is_dir('storage/framework/cache') || mkdir('storage/framework/cache', 0755, true);\"",
+            "@php -r \"is_dir('storage/app/public') || mkdir('storage/app/public', 0755, true);\"",
+            "@php -r \"is_dir('storage/logs') || mkdir('storage/logs', 0755, true);\"",
+            "@php -r \"is_dir('bootstrap/cache') || mkdir('bootstrap/cache', 0755, true);\"",
             "@php artisan package:discover --ansi"
         ],
         "post-root-package-install": [
