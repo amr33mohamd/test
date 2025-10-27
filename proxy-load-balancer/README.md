@@ -4,6 +4,57 @@
 
 ---
 
+## 🚀 Quick Setup (GitHub Codespaces)
+
+### Automatic Setup - Zero Configuration Required!
+
+1. **Open this repository in GitHub Codespaces**
+   - Click the green "Code" button → "Codespaces" → "Create codespace on main"
+
+2. **Wait for automatic setup** (2-3 minutes first time)
+
+   The container will automatically:
+   - ✅ Install PHP 8.2
+   - ✅ Run `composer install` (install all dependencies)
+   - ✅ Run `php artisan key:generate` (configure Laravel)
+   - ✅ Verify everything is working
+
+   You'll see a success message when ready:
+   ```
+   ✅ Setup Complete!
+
+   PHP Version: 8.2.x
+   📦 Composer installed
+   🔑 Laravel key generated
+   ▶️  Run tests: vendor/bin/phpunit
+   📝 Edit code: app/Services/PricingCalculator.php
+   ```
+
+3. **Start coding immediately!**
+   ```bash
+   vendor/bin/phpunit
+   ```
+
+   You should see **13 failing tests** - that's perfect! Your job is to make them pass.
+
+### That's It!
+
+No manual setup required. Everything runs automatically when you open the Codespace.
+
+### Troubleshooting
+
+**Problem**: Setup seems stuck or taking too long (>5 minutes)
+**Solution**: Rebuild the container
+- Press `Cmd/Ctrl + Shift + P` → Type: "Codespaces: Rebuild Container"
+
+**Problem**: `vendor/bin/phpunit` command not found
+**Solution**: The setup didn't complete. Check the terminal output for errors, then rebuild container.
+
+**Problem**: Tests pass immediately without coding anything
+**Solution**: Check that [app/Services/PricingCalculator.php](app/Services/PricingCalculator.php) has TODO comments in the methods
+
+---
+
 ## 🎯 The Challenge
 
 ProxyScrape is a proxy service provider that charges customers based on their bandwidth usage. You need to build a **pricing calculator** that:

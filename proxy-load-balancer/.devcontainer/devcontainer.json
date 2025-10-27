@@ -1,20 +1,28 @@
 {
-  "name": "ProxyScrape Load Balancer - PHP/Laravel",
+  "name": "ProxyScrape Interview Task - PHP 8.2",
   "image": "mcr.microsoft.com/devcontainers/php:8.2",
+
   "features": {
     "ghcr.io/devcontainers/features/node:1": {
       "version": "18"
-    },
-    "ghcr.io/devcontainers/features/git:1": {}
+    }
   },
-  "postCreateCommand": "composer install && php artisan key:generate",
+
+  "onCreateCommand": {
+    "install-deps": "composer install",
+    "generate-key": "php artisan key:generate --force",
+    "verify-setup": "php -v && composer --version"
+  },
+
+  "postCreateCommand": "echo '\n✅ Setup Complete!\n' && echo 'PHP Version:' && php -v && echo '\n📦 Composer installed' && echo '\n🔑 Laravel key generated' && echo '\n▶️  Run tests: vendor/bin/phpunit' && echo '\n📝 Edit code: app/Services/PricingCalculator.php\n'",
+
+  "postStartCommand": "echo '🚀 Codespace ready! Run: vendor/bin/phpunit'",
+
   "customizations": {
     "vscode": {
       "extensions": [
         "bmewburn.vscode-intelephense-client",
-        "MehediDracula.php-namespace-resolver",
-        "onecentlin.laravel-blade",
-        "amirrizvi.laravel-extra-intellisense"
+        "MehediDracula.php-namespace-resolver"
       ],
       "settings": {
         "php.validate.executablePath": "/usr/local/bin/php",
@@ -22,12 +30,8 @@
       }
     }
   },
+
   "forwardPorts": [8000],
-  "portsAttributes": {
-    "8000": {
-      "label": "Laravel App",
-      "onAutoForward": "notify"
-    }
-  },
+
   "remoteUser": "vscode"
 }
