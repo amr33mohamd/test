@@ -1,0 +1,33 @@
+{
+  "name": "ProxyScrape Load Balancer - PHP/Laravel",
+  "image": "mcr.microsoft.com/devcontainers/php:8.2",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "18"
+    },
+    "ghcr.io/devcontainers/features/git:1": {}
+  },
+  "postCreateCommand": "composer install && php artisan key:generate",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "bmewburn.vscode-intelephense-client",
+        "MehediDracula.php-namespace-resolver",
+        "onecentlin.laravel-blade",
+        "amirrizvi.laravel-extra-intellisense"
+      ],
+      "settings": {
+        "php.validate.executablePath": "/usr/local/bin/php",
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
+  },
+  "forwardPorts": [8000],
+  "portsAttributes": {
+    "8000": {
+      "label": "Laravel App",
+      "onAutoForward": "notify"
+    }
+  },
+  "remoteUser": "vscode"
+}

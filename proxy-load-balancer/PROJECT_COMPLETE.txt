@@ -1,0 +1,48 @@
+# ✅ ProxyScrape Pricing Calculator - COMPLETE
+
+## Clean & Simple Setup
+
+### Files Structure:
+```
+proxy-load-balancer/
+├── README.md                          ← Single source of truth
+├── SOLUTION.md                        ← Keep private!
+│
+├── app/Services/
+│   └── PricingCalculator.php          ← Candidate implements here
+│
+├── tests/Feature/
+│   └── PricingCalculatorTest.php      ← 13 automated tests
+│
+└── resources/views/
+    └── welcome.blade.php              ← Nice landing page
+```
+
+## For Candidates:
+1. Read: README.md
+2. Implement: app/Services/PricingCalculator.php
+3. Test: vendor/bin/phpunit
+
+## Test Command Only:
+```bash
+vendor/bin/phpunit
+```
+
+No browser tests, no web routes, just clean PHPUnit testing!
+
+## What They Build:
+- Tiered pricing calculator
+- Loyalty discounts (5% or 10%)
+- Volume discounts (2% per 100GB, max 10%)  
+- Discount stacking (sequential)
+- Plan comparison
+
+## Tests: 13 Total
+All tests run via command line - clean and professional!
+
+## Duration: 45 minutes
+- 5 methods to implement
+- Clear requirements
+- Realistic time frame
+
+Perfect! 🚀
