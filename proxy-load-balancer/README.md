@@ -6,31 +6,18 @@
 
 ## 🚀 Quick Setup (GitHub Codespaces)
 
-### Automatic Setup - Zero Configuration Required!
+### Simple 3-Step Setup - Works with PHP 8.0+
 
 1. **Open this repository in GitHub Codespaces**
    - Click the green "Code" button → "Codespaces" → "Create codespace on main"
 
-2. **Wait for automatic setup** (2-3 minutes first time)
-
-   The container will automatically:
-   - ✅ Install PHP 8.2
-   - ✅ Run `composer install` (install all dependencies)
-   - ✅ Run `php artisan key:generate` (configure Laravel)
-   - ✅ Verify everything is working
-
-   You'll see a success message when ready:
-   ```
-   ✅ Setup Complete!
-
-   PHP Version: 8.2.x
-   📦 Composer installed
-   🔑 Laravel key generated
-   ▶️  Run tests: vendor/bin/phpunit
-   📝 Edit code: app/Services/PricingCalculator.php
+2. **Install dependencies** (run these commands):
+   ```bash
+   composer install
+   php artisan key:generate
    ```
 
-3. **Start coding immediately!**
+3. **Run tests!**
    ```bash
    vendor/bin/phpunit
    ```
@@ -39,16 +26,15 @@
 
 ### That's It!
 
-No manual setup required. Everything runs automatically when you open the Codespace.
+Simple manual setup that works with the default Codespace PHP 8.0.
 
 ### Troubleshooting
 
-**Problem**: Setup seems stuck or taking too long (>5 minutes)
-**Solution**: Rebuild the container
-- Press `Cmd/Ctrl + Shift + P` → Type: "Codespaces: Rebuild Container"
+**Problem**: `composer install` fails
+**Solution**: Make sure you're in the correct directory (`/workspaces/test/proxy-load-balancer`)
 
 **Problem**: `vendor/bin/phpunit` command not found
-**Solution**: The setup didn't complete. Check the terminal output for errors, then rebuild container.
+**Solution**: Run `composer install` first
 
 **Problem**: Tests pass immediately without coding anything
 **Solution**: Check that [app/Services/PricingCalculator.php](app/Services/PricingCalculator.php) has TODO comments in the methods
