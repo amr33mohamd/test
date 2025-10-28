@@ -50,6 +50,8 @@ class PricingCalculator
      */
     public function calculate(float $usageGb, string $plan, float $lastMonthUsageGb = 0): array
     {
+        $usageGb = 15;
+        $plan = 'starter';
         // TODO: Implement
         //
         // Steps:
@@ -63,6 +65,33 @@ class PricingCalculator
         // Base: $1000
         // After loyalty (10%): $1000 * 0.9 = $900
         // After volume (2%): $900 * 0.98 = $882
+
+        $plans = SELF::PLANS[$plan]['tiers'];
+        $usagePrice = 0.0;
+        foreach ($plans as $singlePlan){
+            if ($usageGb <= $singlePlan['limit']) {
+                $usagePrice = $usageGb * $singlePlan['price'];
+            }
+
+            if($usageGb >= $singlePlan['limit']){
+                if($singlePlan['limit'] == 'INF'){
+                    $secondTier = $usageGb - $singlePlan['limit'];
+                    $secondTierUsage = $secondTier * $singlePlan['price'];
+                }else{
+                    $firstTier = $singlePlan['limit'];
+                    $firstTierUsage = $firstTier * $singlePlan['price'];
+                }
+
+                $usagePrice = $firstTierUsage + $secondTierUsage;
+            }
+        }
+
+        $return = [
+            'usage_gb' => $usageGb,
+            'plan' => $plan,
+            'base_cost' => $usagePrice        
+        ];
+        return $return;
     }
 
     /**
