@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Exception;
+
 class PricingCalculator
 {
     const PLANS = [
@@ -50,46 +51,43 @@ class PricingCalculator
      */
     public function calculate(float $usageGb, string $plan, float $lastMonthUsageGb = 0): array
     {
-        $usageGb = 15;
-        $plan = 'starter';
-        // TODO: Implement
-        //
-        // Steps:
-        // 1. Validate inputs (plan exists, usage >= 0)
-        // 2. Calculate base cost using tiered pricing
-        // 3. Apply loyalty discount (5% if >50GB, 10% if >100GB)
-        // 4. Apply volume discount (2% per 100GB, max 10%)
-        // 5. Return detailed breakdown with all fields
-        //
-        // Discount stacking example:
-        // Base: $1000
-        // After loyalty (10%): $1000 * 0.9 = $900
-        // After volume (2%): $900 * 0.98 = $882
-
-        $plans = SELF::PLANS[$plan]['tiers'];
-        $usagePrice = 0.0;
-        foreach ($plans as $singlePlan){
-            if ($usageGb <= $singlePlan['limit']) {
-                $usagePrice = $usageGb * $singlePlan['price'];
-            }
-
-            if($usageGb >= $singlePlan['limit']){
-                if($singlePlan['limit'] == 'INF'){
-                    $secondTier = $usageGb - $singlePlan['limit'];
-                    $secondTierUsage = $secondTier * $singlePlan['price'];
-                }else{
-                    $firstTier = $singlePlan['limit'];
-                    $firstTierUsage = $firstTier * $singlePlan['price'];
-                }
-
-                $usagePrice = $firstTierUsage + $secondTierUsage;
-            }
+        //1. Validate inputs (plan exists, usage >= 0)
+        if (!isset(self::PLANS[$plan])) {
+            throw new Exception('Invalid plan provided');
         }
 
+        if ($usageGb < 0) {
+            throw new Exception('Usage cannot be negative');
+        }
+
+        //2. Calculate base cost using tiered pricing
+        $baseCost = $this->calculateBaseCost($usageGb, $plan);
+
+        //3. Apply loyalty discount (5% if >50GB, 10% if >100GB)
+        $loyaltyPercent = $this->getLoyaltyDiscount($lastMonthUsageGb);
+        $loyaltyAmount = round($baseCost * ($loyaltyPercent / 100), 2);
+        $afterLoyalty = $baseCost - $loyaltyAmount;
+
+        //4. Apply volume discount (2% per 100GB, max 10%)
+        $volumePercent = $this->getVolumeDiscount($usageGb);
+        $volumeAmount = round($afterLoyalty * ($volumePercent / 100), 2);
+
+        //5. Return detailed breakdown with all fields
+        $finalCost = round($afterLoyalty - $volumeAmount, 2);
+        $totalDiscount = round($loyaltyAmount + $volumeAmount, 2);
+        $effectiveRate = $usageGb > 0 ? round($finalCost / $usageGb, 2) : 0;
+
         $return = [
-            'usage_gb' => $usageGb,
+            'usage_gb' => (float)$usageGb,
             'plan' => $plan,
-            'base_cost' => $usagePrice        
+            'base_cost' => (float)round($baseCost, 2),
+            'loyalty_discount_percent' => (float)$loyaltyPercent,
+            'loyalty_discount_amount' => (float)$loyaltyAmount,
+            'volume_discount_percent' => (float)$volumePercent,
+            'volume_discount_amount' => (float)$volumeAmount,
+            'total_discount_amount' => (float)$totalDiscount,
+            'final_cost' => (float)$finalCost,
+            'effective_rate_per_gb' => (float)$effectiveRate
         ];
         return $return;
     }
@@ -112,15 +110,35 @@ class PricingCalculator
      */
     private function calculateBaseCost(float $usageGb, string $plan): float
     {
-        // TODO: Implement tiered pricing logic
-        //
-        // Algorithm:
-        // 1. Get tiers for the plan
-        // 2. Loop through each tier
-        // 3. Calculate how much usage falls in this tier
-        // 4. Multiply by tier price
-        // 5. Subtract used amount from remaining usage
-        // 6. Stop when no usage left
+        //Get tiers for the plan
+        $tiers = self::PLANS[$plan]['tiers'];
+        $remaining = $usageGb;
+        $previousLimit = 0.0;
+        $cost = 0.0;
+
+        //Loop through each tier
+        foreach ($tiers as $tier) {
+            //Get tier limit and price
+            $tierLimit = $tier['limit'];
+            $tierPrice = $tier['price'];
+
+            $currentCap = $tierLimit === INF ? INF : (float)$tierLimit;
+            $allocatable = min($remaining, $currentCap - $previousLimit);
+
+            if ($allocatable <= 0) {
+                break;
+            }
+
+            $cost += $allocatable * $tierPrice;
+            $remaining -= $allocatable;
+            $previousLimit += $allocatable;
+
+            if ($remaining <= 0) {
+                break;
+            }
+        }
+
+        return round($cost, 2);
     }
 
     /**
@@ -136,8 +154,15 @@ class PricingCalculator
      */
     private function getLoyaltyDiscount(float $lastMonthUsageGb): float
     {
-        // TODO: Implement
-        // Hint: Use if/elseif/else or match/switch
+        if ($lastMonthUsageGb > 100) {
+            return 10.0;
+        }
+
+        if ($lastMonthUsageGb >= 51) {
+            return 5.0;
+        }
+
+        return 0.0;
     }
 
     /**
@@ -158,8 +183,11 @@ class PricingCalculator
      */
     private function getVolumeDiscount(float $usageGb): float
     {
-        // TODO: Implement
-        // Hint: Use floor($usageGb / 100) * 2, then cap at 10
+        $percent = floor($usageGb / 100) * 2;
+        if ($percent > 10) {
+            $percent = 10;
+        }
+        return (float)$percent;
     }
 
     /**
@@ -193,12 +221,35 @@ class PricingCalculator
      */
     public function recommendPlan(float $usageGb, float $lastMonthUsageGb = 0): array
     {
-        // TODO: Implement
-        //
-        // Algorithm:
-        // 1. Calculate cost for each plan (starter, pro, enterprise)
-        // 2. Find the cheapest plan
-        // 3. Calculate savings vs recommended for each plan
-        // 4. Return recommendation with full comparison
+        $plans = array_keys(self::PLANS);
+        $comparison = [];
+
+        $minCost = null;
+        $recommended = null;
+
+        foreach ($plans as $p) {
+            $calc = $this->calculate($usageGb, $p, $lastMonthUsageGb);
+            $cost = (float)$calc['final_cost'];
+            $comparison[$p] = [
+                'cost' => (float)round($cost, 2),
+                'savings_vs_recommended' => 0
+            ];
+
+            if ($minCost === null || $cost < $minCost) {
+                $minCost = $cost;
+                $recommended = $p;
+            }
+        }
+
+        foreach ($comparison as $p => &$entry) {
+            $entry['savings_vs_recommended'] = (float)round($entry['cost'] - $minCost, 2);
+        }
+        unset($entry);
+
+        return [
+            'recommended_plan' => $recommended,
+            'estimated_usage_gb' => (float)$usageGb,
+            'comparison' => $comparison
+        ];
     }
 }
